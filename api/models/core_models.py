@@ -45,7 +45,7 @@ class OktaUserGroupMember(db.Model):
     group: Mapped["OktaGroup"] = db.relationship(
         "OktaGroup",
         back_populates="all_user_memberships_and_ownerships",
-        lazy="raise_on_sql",
+        lazy="selectin",
     )
     active_group: Mapped["OktaGroup"] = db.relationship(
         "OktaGroup",
@@ -186,7 +186,7 @@ class OktaUser(db.Model):
         "OktaUserGroupMember.is_owner.is_(False), "
         "or_(OktaUserGroupMember.ended_at.is_(None), OktaUserGroupMember.ended_at > func.now()))",
         viewonly=True,
-        lazy="raise_on_sql",
+        lazy="selectin",
         innerjoin=True,
     )
     active_group_ownerships: Mapped[List[OktaUserGroupMember]] = db.relationship(
@@ -195,7 +195,7 @@ class OktaUser(db.Model):
         "OktaUserGroupMember.is_owner.is_(True), "
         "or_(OktaUserGroupMember.ended_at.is_(None), OktaUserGroupMember.ended_at > func.now()))",
         viewonly=True,
-        lazy="raise_on_sql",
+        lazy="selectin",
         innerjoin=True,
     )
 
