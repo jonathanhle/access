@@ -237,7 +237,7 @@ export default function ReadGroup() {
                     justifyContent: 'center',
                     position: 'relative',
                   }}>
-                  <Typography variant="h3">
+                  <Typography variant="h5">
                     {group.deleted_at != null ? (
                       <>
                         <s>{group.name}</s> is Deleted
@@ -246,7 +246,7 @@ export default function ReadGroup() {
                       group.name
                     )}
                   </Typography>
-                  <Typography variant="h5">{group.description}</Typography>
+                  <Typography variant="h6">{group.description}</Typography>
                   <Box>
                     {group.active_group_tags?.map((tagMap) => (
                       <Chip
