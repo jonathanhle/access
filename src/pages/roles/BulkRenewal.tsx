@@ -79,8 +79,6 @@ const UNTIL_ID_TO_LABELS: Record<string, string> = {
   '1209600': 'Two Weeks',
   '2592000': '30 Days',
   '7776000': '90 Days',
-  indefinite: 'Indefinite',
-  custom: 'Custom',
 } as const;
 
 const UNTIL_JUST_NUMERIC_ID_TO_LABELS: Record<string, string> = {
@@ -157,7 +155,7 @@ function BulkRenewalDialog(props: BulkRenewalDialogProps) {
   const [labels, setLabels] = React.useState<Array<Record<string, string>>>(UNTIL_OPTIONS);
   const [timeLimit, setTimeLimit] = React.useState<number | null>(null);
   const [requiredReason, setRequiredReason] = React.useState<boolean>(false);
-  const [until, setUntil] = React.useState('1209600');
+  const [until, setUntil] = React.useState('43200');
 
   const [paginationModel, setPaginationModel] = React.useState({
     pageSize: 10,

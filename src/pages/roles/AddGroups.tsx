@@ -85,8 +85,6 @@ const UNTIL_ID_TO_LABELS: Record<string, string> = {
   '1209600': 'Two Weeks',
   '2592000': '30 Days',
   '7776000': '90 Days',
-  indefinite: 'Indefinite',
-  custom: 'Custom',
 } as const;
 
 const UNTIL_JUST_NUMERIC_ID_TO_LABELS: Record<string, string> = {
@@ -121,7 +119,7 @@ function AddGroupsDialog(props: AddGroupsDialogProps) {
     props.group.active_user_memberships?.map((membership) => membership.active_user!.id).includes(currentUser.id) ??
     false;
 
-  const [until, setUntil] = React.useState('1209600');
+  const [until, setUntil] = React.useState('43200');
   const [groupSearchInput, setGroupSearchInput] = React.useState('');
   const [groups, setGroups] = React.useState<Array<OktaGroup | AppGroup>>([]);
   const [requestError, setRequestError] = React.useState('');

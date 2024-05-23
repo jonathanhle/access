@@ -76,8 +76,6 @@ const UNTIL_ID_TO_LABELS: Record<string, string> = {
   '1209600': 'Two Weeks',
   '2592000': '30 Days',
   '7776000': '90 Days',
-  indefinite: 'Indefinite',
-  custom: 'Custom',
 } as const;
 
 const UNTIL_JUST_NUMERIC_ID_TO_LABELS: Record<string, string> = {
@@ -154,7 +152,7 @@ function BulkRenewalDialog(props: BulkRenewalDialogProps) {
   const [selected, setSelected] = React.useState<OktaUserGroupMember[]>(() =>
     props.select != undefined ? props.rows.filter((r) => r.id == props.select) : [],
   );
-  const [until, setUntil] = React.useState('1209600');
+  const [until, setUntil] = React.useState('43200');
 
   const [selectionModel, setSelectionModel] = React.useState<GridRowSelectionModel>(() =>
     props.rows.filter((r) => r.id == props.select).map((r) => r.id),

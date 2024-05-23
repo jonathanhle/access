@@ -439,7 +439,7 @@ export default function ReadRequest() {
                       'membership to'
                     )}
                   </Typography>
-                  <Typography variant="h4">
+                  <Typography variant="h5">
                     {(accessRequest.requested_group?.deleted_at ?? null) != null ? (
                       <Link
                         to={`/groups/${accessRequest.requested_group?.id ?? ''}`}

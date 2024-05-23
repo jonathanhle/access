@@ -174,8 +174,6 @@ const UNTIL_ID_TO_LABELS: Record<string, string> = {
   '1209600': 'Two Weeks',
   '2592000': '30 Days',
   '7776000': '90 Days',
-  indefinite: 'Indefinite',
-  custom: 'Custom',
 } as const;
 
 const UNTIL_JUST_NUMERIC_ID_TO_LABELS: Record<string, string> = {
@@ -232,7 +230,7 @@ function CreateRequestContainer(props: CreateRequestContainerProps) {
 
   const untilLabels: [string, Array<Record<string, string>>] = timeLimit
     ? filterUntilLabels(timeLimit)
-    : ['1209600', UNTIL_OPTIONS];
+    : ['43200', UNTIL_OPTIONS];
   const [until, setUntil] = React.useState(untilLabels[0]);
   const [labels, setLabels] = React.useState<Array<Record<string, string>>>(untilLabels[1]);
 
@@ -320,7 +318,7 @@ function CreateRequestContainer(props: CreateRequestContainerProps) {
     <FormContainer<CreateRequestForm>
       defaultValues={{
         group: props.group,
-        until: '1209600',
+        until: '43200',
         ownerOrMember: props.owner != null ? (props.owner ? 'owner' : 'member') : undefined,
       }}
       onSuccess={(formData) => submit(formData)}>
