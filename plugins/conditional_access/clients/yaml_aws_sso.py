@@ -15,7 +15,7 @@ def find_first_matching_service(target_okta_group_mapping):
         """
         Determine the appropriate YAML file and service key based on the prefix of the target_okta_group_mapping.
         """
-        if target_okta_group_mapping.startswith("APP_AWS_SSO_"):
+        if target_okta_group_mapping.startswith("APP_AWS_SSO"):
             return SERVICES_AWS_SSO, "aws_services"
         elif target_okta_group_mapping.startswith("APP_TG_"):
             return SERVICES_TWINGATE_SSO, "twingate_services"

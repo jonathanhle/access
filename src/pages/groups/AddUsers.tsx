@@ -79,6 +79,7 @@ interface AddUsersForm {
 const RFC822_FORMAT = 'ddd, DD MMM YYYY HH:mm:ss ZZ';
 
 const UNTIL_ID_TO_LABELS: Record<string, string> = {
+  '14400': '4 Hours',
   '43200': '12 Hours',
   '432000': '5 Days',
   '1209600': 'Two Weeks',
@@ -87,6 +88,7 @@ const UNTIL_ID_TO_LABELS: Record<string, string> = {
 } as const;
 
 const UNTIL_JUST_NUMERIC_ID_TO_LABELS: Record<string, string> = {
+  '14400': '4 Hours',
   '43200': '12 Hours',
   '432000': '5 Days',
   '1209600': 'Two Weeks',
