@@ -11,6 +11,8 @@ from clients.yaml_aws_sso import find_first_matching_service
 from api.models import AccessRequest, OktaGroup, OktaUser, Tag
 from api.plugins import ConditionalAccessResponse
 
+from api.operations.reject_access_request import RejectAccessRequest
+
 request_hook_impl = pluggy.HookimplMarker("access_conditional_access")
 logger = logging.getLogger(__name__)
 
@@ -20,6 +22,14 @@ def access_request_created(
     access_request: AccessRequest, group: OktaGroup, group_tags: List[Tag], requester: OktaUser
 ) -> Optional[ConditionalAccessResponse]:
     """Auto-approve memberships to the Auto-Approved-Group group"""
+    
+    # Immediately reject requests for Group Ownership
+    if access_request.request_ownership:
+        RejectAccessRequest(
+            access_request=access_request,
+            rejection_reason="Requests for Group Ownership are configured through the services YAMLs",
+            notify=False,
+        ).execute()
 
     # Require the request not be for Group Ownership and has a request reason
     if not access_request.request_ownership and access_request.request_reason:
