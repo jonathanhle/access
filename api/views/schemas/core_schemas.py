@@ -245,8 +245,8 @@ class OktaGroupSchema(SQLAlchemyAutoSchema):
         validate=validate.And(
             validate.Length(min=1, max=255),
             validate.Regexp(
-                "^[A-Z][A-Za-z0-9-]*$",
-                error="Group name must start capitalized and contain only alphanumeric characters or hyphens. "
+                "^[A-Z][A-Za-z0-9_.\\-*]*$",
+                error="Group name must start capitalized and contain only alphanumeric characters, underscores, periods, hyphens or *."
                 "Regex to match: /{regex}/",
             ),
         ),
@@ -838,7 +838,7 @@ class AppGroupSchema(SQLAlchemyAutoSchema):
             validate.Length(min=1, max=255),
             validate.Regexp(
                 f"^{AppGroup.APP_GROUP_NAME_PREFIX}[A-Z][A-Za-z0-9-]*{AppGroup.APP_NAME_GROUP_NAME_SEPARATOR}[A-Z][A-Za-z0-9-]*$",
-                error="Group name must start capitalized and contain only alphanumeric characters or hyphens. "
+                error="Group name must start capitalized and contain only alphanumeric characters, underscores, periods, hyphens or *."
                 "Regex to match: /{regex}/",
             ),
         ),
@@ -1130,7 +1130,7 @@ class InitialAppGroupSchema(Schema):
             validate.Length(min=1, max=255),
             validate.Regexp(
                 f"^{AppGroup.APP_GROUP_NAME_PREFIX}[A-Z][A-Za-z0-9-]*{AppGroup.APP_NAME_GROUP_NAME_SEPARATOR}[A-Z][A-Za-z0-9-]*$",
-                error="Group name must start capitalized and contain only alphanumeric characters or hyphens. "
+                error="Group name must start capitalized and contain only alphanumeric characters, underscores, periods, hyphens or *."
                 "Regex to match: /{regex}/",
             ),
         ),
@@ -1144,7 +1144,7 @@ class AppSchema(SQLAlchemyAutoSchema):
         validate=validate.And(
             validate.Length(min=1, max=255),
             validate.Regexp(
-                "^[A-Z][A-Za-z0-9-]*$",
+                "^[A-Z][A-Za-z0-9_.\\-*]*$",
                 error="App name must start capitalized and contain only alphanumeric characters or hyphens. "
                 "Regex to match: /{regex}/",
             ),
@@ -1388,7 +1388,7 @@ class TagSchema(SQLAlchemyAutoSchema):
         validate=validate.And(
             validate.Length(min=1, max=255),
             validate.Regexp(
-                "^[A-Z][A-Za-z0-9-]*$",
+                "^[A-Z][A-Za-z0-9_.\\-*]*$",
                 error="Tag name must start capitalized and contain only alphanumeric characters or hyphens. "
                 "Regex to match: /{regex}/",
             ),
