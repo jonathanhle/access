@@ -19,7 +19,7 @@ slack_token = os.environ["SLACK_BOT_TOKEN"]
 signing_secret = os.environ["SLACK_SIGNING_SECRET"]
 client = WebClient(token=slack_token)
 signature_verifier = SignatureVerifier(signing_secret)
-alerts_channel = "#platsec-alerts-multipass"  # Set your specific channel name here
+alerts_channel = "#multipass"  # Set your specific channel name here
 
 def get_base_url() -> str:
     env = os.environ.get("FLASK_ENV", "development")
@@ -100,7 +100,7 @@ def access_request_created(
 
     approver_message = (
         f"{requester.email} has requested {type_of_access} {group.name}.\n\n"
-        f"[View request to approve or reject]({access_request_url})\n\n"
+        f"<{access_request_url}|View request to approve or reject>\n\n"
     )
 
     # Send the message to the approvers
@@ -125,7 +125,7 @@ def access_request_completed(
 
     requester_message = (
         f"Request for access to {group.name} has been {access_request.status.lower()}.\n\n"
-        f"[View request]({access_request_url})"
+        f"<{access_request_url}|View request>\n"
     )
 
     # Send the message to the requester
@@ -146,7 +146,7 @@ def access_expiring_user(groups: list[OktaGroup], user: OktaUser, expiration_dat
 
     message = (
         f"Your access to {group_or_groups} is expiring {parse_dates(expiration_datetime, False)}.\n\n"
-        f"Click [here]({expiring_access_url}) to view your access and, if still needed, create a request to renew it."
+        f"Click <{expiring_access_url}|here> to view your access and, if still needed, create a request to renew it."
     )
 
     # Send the message to the individual user with expiring access
@@ -174,7 +174,7 @@ def access_expiring_owner(
 
         message = (
             f"{single_or_group} of {group_or_groups} you own will lose access {parse_dates(expiration_datetime, True)}.\n\n"
-            f"Click [here]({expiring_access_url}) to review the owners and members with expiring access and determine if the "
+            f"Click <{expiring_access_url}|here> to review the owners and members with expiring access and determine if the "
             f"access is still appropriate. If so, renew their membership/ownership so they do not lose access."
         )
 
@@ -194,7 +194,7 @@ def access_expiring_owner(
         message = (
             f"{single_or_group} that {is_are} granted access to {group_or_groups} you own will lose access "
             f"{parse_dates(expiration_datetime, True)}.\n\n"
-            f"Click [here]({expiring_access_url}) to view expiring roles and, if still appropriate, renew their access."
+            f"Click <{expiring_access_url}|here> to view expiring roles and, if still appropriate, renew their access."
         )
 
         # Send the message to the group owner about the roles with expiring access
