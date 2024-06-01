@@ -19,7 +19,7 @@ slack_token = os.environ["SLACK_BOT_TOKEN"]
 signing_secret = os.environ["SLACK_SIGNING_SECRET"]
 client = WebClient(token=slack_token)
 signature_verifier = SignatureVerifier(signing_secret)
-alerts_channel = "#multipass"  # Set your specific channel name here
+alerts_channel = os.environ["SLACK_ALERTS_CHANNEL"]
 
 def get_base_url() -> str:
     env = os.environ.get("FLASK_ENV", "development")
