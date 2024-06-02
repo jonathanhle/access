@@ -75,7 +75,9 @@ def get_pd_user_email(user_id: AnyStr) -> Optional[AnyStr]:
         return None
 
 
-def get_pd_user_incidents(user_id: AnyStr, search_string: AnyStr) -> Dict[str, Union[List[Dict[str, AnyStr]], Dict[str, AnyStr], List[AnyStr]]]:
+def get_pd_user_incidents(
+    user_id: AnyStr, search_string: AnyStr
+) -> Dict[str, Union[List[Dict[str, AnyStr]], Dict[str, AnyStr], List[AnyStr]]]:
     """Get a User's Active PagerDuty incidents containing a search string.
 
     Args:
@@ -105,13 +107,17 @@ def get_pd_user_incidents(user_id: AnyStr, search_string: AnyStr) -> Dict[str, U
 
         incidents = response.json().get("incidents", [])
         for incident in incidents:
-            if search_string.lower() in incident["service"].get("summary", "").lower() or search_string.lower() in incident.get("title", "").lower():
+            if (
+                search_string.lower() in incident["service"].get("summary", "").lower()
+                or search_string.lower() in incident.get("title", "").lower()
+            ):
                 parse_incident = {
                     "incident_id": incident.get("id"),
                     "incident_name": incident.get("title"),
                     "incident_html_url": incident.get("html_url"),
                     "incident_assignees": [
-                        (assignee["assignee"]["summary"], assignee["assignee"]["id"]) for assignee in incident.get("assignments", [])
+                        (assignee["assignee"]["summary"], assignee["assignee"]["id"])
+                        for assignee in incident.get("assignments", [])
                     ],
                     "incident_assignees_by_email": [
                         get_pd_user_email(assignee["assignee"]["id"]) for assignee in incident.get("assignments", [])

@@ -11,6 +11,7 @@ from api.models import AppGroup, OktaGroup, OktaUserGroupMember, RoleGroup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def get_group_by_name(group_name: str) -> Optional[OktaGroup]:
     """Fetches an active OktaGroup by its name.
 
