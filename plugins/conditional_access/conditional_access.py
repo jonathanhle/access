@@ -41,17 +41,17 @@ def access_request_created(
         logger.info(f"requester_username is: {requester_username}")
 
         pd_user_id = get_pd_user_id(requester_username)
-        print(f"pd_user_id are: {pd_user_id}")
+        logger.info(f"pd_user_id are: {pd_user_id}")
         if pd_user_id:
             active_incidents = get_pd_user_incidents(pd_user_id, group.name)
-            print(f"active_incidents are: {active_incidents}")
+            logger.info(f"active_incidents are: {active_incidents}")
 
             if active_incidents:
                 active_incidents_all_combined_assignees_by_email = active_incidents["all_combined_assignees_by_email"]
                 active_incidents_matching_incidents = active_incidents["matching_incidents"]
 
         yaml_service = find_first_matching_service(group.name)
-        print(f"yaml_service is {yaml_service}")
+        logger.info(f"yaml_service is {yaml_service}")
         if yaml_service:
             # -----------------------------------------------------------
             # NON-SENSITIVE ACCESS ATTRIBUTES
