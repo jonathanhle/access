@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Optional, Tuple, Dict, Any
+from typing import Any, Dict, Optional, Tuple
 
 import yaml
 
@@ -57,26 +57,23 @@ def find_first_matching_service(target_okta_group_mapping: str) -> Optional[Dict
 
     try:
         with open(service_file, "r") as file:
-            documents = yaml.safe_load_all(file)
+            documents = list(yaml.safe_load_all(file))  # Convert to list to keep the file open while processing
+
+        for doc in documents:
+            services = doc.get(service_key, [])
+            for service in services:
+                if service_key == "aws_services":
+                    if service.get("okta_group_mapping") == target_okta_group_mapping:
+                        logger.info(f"Matching service found in {service_file}.")
+                        return service
+                elif service_key == "twingate_services":
+                    hostname = service.get("hostname", "")
+                    if target_okta_group_mapping.split("_", 2)[-1] == hostname:
+                        logger.info(f"Matching service found in {service_file}.")
+                        return service
     except yaml.YAMLError as exc:
         logger.error(f"Error parsing YAML file: {exc}")
         return None
-
-    for doc in documents:
-        services = doc.get(service_key, [])
-        for service in services:
-            if service_key == "aws_services":
-                # Match based on okta_group_mapping directly for AWS services
-                if service.get("okta_group_mapping") == target_okta_group_mapping:
-                    logger.info(f"Matching service found in {service_file}.")
-                    return service
-            elif service_key == "twingate_services":
-                # Match based on hostname for Twingate services
-                hostname = service.get("hostname", "")
-                # Extract the hostname part from the target_okta_group_mapping
-                if target_okta_group_mapping.split("_", 2)[-1] == hostname:
-                    logger.info(f"Matching service found in {service_file}.")
-                    return service
 
     logger.info(f"No matching service found in {service_file}.")
     return None

@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import AnyStr, List, Tuple, Optional, Dict, Union
+from typing import AnyStr, Dict, List, Optional, Tuple, Union
 
 import requests
 
@@ -68,8 +68,12 @@ def get_pd_user_email(user_id: AnyStr) -> Optional[AnyStr]:
 
         response.raise_for_status()
 
-        user_email = response.json().get("user", {}).get("email", [])
-        return user_email
+        user_email = response.json().get("user", {}).get("email")
+        if user_email:
+            return user_email
+        else:
+            logger.info(f"No email found for user ID: {user_id}")
+            return None
     except requests.exceptions.RequestException as e:
         logger.error(f"HTTP Request failed: {e}")
         return None
@@ -77,7 +81,7 @@ def get_pd_user_email(user_id: AnyStr) -> Optional[AnyStr]:
 
 def get_pd_user_incidents(
     user_id: AnyStr, search_string: AnyStr
-) -> Dict[str, Union[List[Dict[str, AnyStr]], Dict[str, AnyStr], List[AnyStr]]]:
+) -> Dict[str, Union[List[Dict[str, AnyStr]], List[Tuple[str, str]], List[AnyStr]]]:
     """Get a User's Active PagerDuty incidents containing a search string.
 
     Args:
@@ -85,7 +89,7 @@ def get_pd_user_incidents(
         search_string (AnyStr): The string to search for in incident summaries and titles.
 
     Returns:
-        Dict[str, Union[List[Dict[str, AnyStr]], Dict[str, AnyStr], List[AnyStr]]]: A dictionary containing matching incidents,
+        Dict[str, Union[List[Dict[str, AnyStr]], List[Tuple[str, str]], List[AnyStr]]]: A dictionary containing matching incidents,
                                                                                    all combined assignees, and all combined assignees by email.
     """
     matching_incidents = []
