@@ -21,6 +21,7 @@ client = WebClient(token=slack_token)
 signature_verifier = SignatureVerifier(signing_secret)
 alerts_channel = os.environ["SLACK_ALERTS_CHANNEL"]
 
+
 def get_base_url() -> str:
     env = os.environ.get("FLASK_ENV", "development")
     if env == "production":
@@ -63,7 +64,7 @@ def parse_dates(comparison_date: datetime, owner: bool) -> str:
 def get_user_id_by_email(email: str) -> str:
     try:
         response = client.users_lookupByEmail(email=email)
-        return response['user']['id']
+        return response["user"]["id"]
     except SlackApiError as e:
         logger.error(f"Error fetching user ID for {email}: {e.response['error']}")
         return None
@@ -74,7 +75,9 @@ def send_slack_dm(user: OktaUser, message: str) -> None:
     if user_id:
         mention_message = f"<@{user_id}> {message}"
         try:
-            response = client.chat_postMessage(channel=user_id, text=mention_message, as_user=True, unfurl_links=True, unfurl_media=True)
+            response = client.chat_postMessage(
+                channel=user_id, text=mention_message, as_user=True, unfurl_links=True, unfurl_media=True
+            )
             logger.info(f"Slack DM sent: {response['ts']}")
         except SlackApiError as e:
             logger.error(f"Error sending Slack message: {e.response['error']}")
@@ -82,7 +85,9 @@ def send_slack_dm(user: OktaUser, message: str) -> None:
 
 def send_slack_channel_message(message: str) -> None:
     try:
-        response = client.chat_postMessage(channel=alerts_channel, text=message, as_user=True, unfurl_links=True, unfurl_media=True)
+        response = client.chat_postMessage(
+            channel=alerts_channel, text=message, as_user=True, unfurl_links=True, unfurl_media=True
+        )
         logger.info(f"Slack channel message sent: {response['ts']}")
     except SlackApiError as e:
         logger.error(f"Error sending Slack channel message: {e.response['error']}")
