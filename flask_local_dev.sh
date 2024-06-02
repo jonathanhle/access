@@ -3,8 +3,10 @@
 start() {
     # Uninstall and reinstall Python packages
     pip uninstall "access-conditional-access @ file:///Users/jonathan.le/dev/jonathanhle/access/plugins/conditional_access" --yes
+    pip install -r ./plugins/conditional_access/requirements.txt
     pip install ./plugins/conditional_access
     pip uninstall "access-notifications @ file:///Users/jonathan.le/dev/jonathanhle/access/plugins/notifications" --yes
+    pip install -r ./plugins/notifications/requirements.txt
     pip install ./plugins/notifications
 
     # Check if Flask is already running
