@@ -13,7 +13,14 @@ logging.basicConfig(level=logging.INFO)
 
 
 def get_pd_user_id(username: AnyStr) -> Optional[AnyStr]:
-    """Get PagerDuty User ID, if available."""
+    """Get PagerDuty User ID by username.
+
+    Args:
+        username (AnyStr): The username to search for.
+
+    Returns:
+        Optional[AnyStr]: The user ID if found, otherwise None.
+    """
     try:
         response = requests.get(
             url="https://api.pagerduty.com/users",
@@ -41,7 +48,14 @@ def get_pd_user_id(username: AnyStr) -> Optional[AnyStr]:
 
 
 def get_pd_user_email(user_id: AnyStr) -> Optional[AnyStr]:
-    """Get PagerDuty User email by user ID."""
+    """Get PagerDuty User email by user ID.
+
+    Args:
+        user_id (AnyStr): The user ID to search for.
+
+    Returns:
+        Optional[AnyStr]: The user email if found, otherwise None.
+    """
     try:
         response = requests.get(
             url=f"https://api.pagerduty.com/users/{user_id}",
@@ -62,7 +76,16 @@ def get_pd_user_email(user_id: AnyStr) -> Optional[AnyStr]:
 
 
 def get_pd_user_incidents(user_id: AnyStr, search_string: AnyStr) -> Dict[str, Union[List[Dict[str, AnyStr]], Dict[str, AnyStr], List[AnyStr]]]:
-    """Get a User's Active PagerDuty incidents containing a search string."""
+    """Get a User's Active PagerDuty incidents containing a search string.
+
+    Args:
+        user_id (AnyStr): The user ID to search for incidents.
+        search_string (AnyStr): The string to search for in incident summaries and titles.
+
+    Returns:
+        Dict[str, Union[List[Dict[str, AnyStr]], Dict[str, AnyStr], List[AnyStr]]]: A dictionary containing matching incidents,
+                                                                                   all combined assignees, and all combined assignees by email.
+    """
     matching_incidents = []
     all_assignees_across_incidents = []
     all_assignees_across_incidents_by_email = []
