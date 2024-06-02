@@ -22,7 +22,7 @@ def access_request_created(
     access_request: AccessRequest, group: OktaGroup, group_tags: List[Tag], requester: OktaUser
 ) -> Optional[ConditionalAccessResponse]:
     """Auto-approve memberships to the Auto-Approved-Group group"""
-    
+
     # Immediately reject requests for Group Ownership
     if access_request.request_ownership:
         RejectAccessRequest(
