@@ -20,7 +20,7 @@ slack_token = os.environ["SLACK_BOT_TOKEN"]
 signing_secret = os.environ["SLACK_SIGNING_SECRET"]
 client = WebClient(token=slack_token)
 signature_verifier = SignatureVerifier(signing_secret)
-alerts_channel = os.environ["SLACK_ALERTS_CHANNEL"]
+alerts_channel = os.environ.get("SLACK_ALERTS_CHANNEL")
 
 
 def get_base_url() -> str:
@@ -113,18 +113,19 @@ def send_slack_dm(user: OktaUser, message: str) -> None:
 
 
 def send_slack_channel_message(message: str) -> None:
-    """Send a message to a Slack channel.
+    """Send a message to a Slack channel if the alerts_channel is defined.
 
     Args:
         message (str): The message content.
     """
-    try:
-        response = client.chat_postMessage(
-            channel=alerts_channel, text=message, as_user=True, unfurl_links=True, unfurl_media=True
-        )
-        logger.info(f"Slack channel message sent: {response['ts']}")
-    except SlackApiError as e:
-        logger.error(f"Error sending Slack channel message: {e.response['error']}")
+    if alerts_channel:
+        try:
+            response = client.chat_postMessage(
+                channel=alerts_channel, text=message, as_user=True, unfurl_links=True, unfurl_media=True
+            )
+            logger.info(f"Slack channel message sent: {response['ts']}")
+        except SlackApiError as e:
+            logger.error(f"Error sending Slack channel message: {e.response['error']}")
 
 
 @notification_hook_impl
