@@ -144,7 +144,7 @@ def access_request_created(
     access_request_url = get_base_url() + f"/requests/{access_request.id}"
 
     approver_message = (
-        f"{requester.email} has requested {type_of_access} {group.name}.\n\n"
+        f":pray: {requester.email} has requested {type_of_access} {group.name}.\n\n"
         f"<{access_request_url}|View request to approve or reject>\n\n"
     )
 
@@ -175,9 +175,10 @@ def access_request_completed(
         notify_requester (bool): Whether to notify the requester.
     """
     access_request_url = get_base_url() + f"/requests/{access_request.id}"
+    emoji = ":white_check_mark:" if access_request.status.lower() == "approved" else ":x:"
 
     requester_message = (
-        f"Request for access to {group.name} has been {access_request.status.lower()}.\n\n"
+        f"{emoji} Request for access to {group.name} has been {access_request.status.lower()}.\n\n"
         f"<{access_request_url}|View request>\n"
     )
 
