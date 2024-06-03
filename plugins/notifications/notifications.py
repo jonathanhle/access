@@ -3,6 +3,7 @@ from __future__ import print_function
 import logging
 import os
 from datetime import date, datetime, timedelta
+from typing import List, Optional
 
 import pluggy
 from slack_sdk import WebClient
@@ -23,6 +24,11 @@ alerts_channel = os.environ["SLACK_ALERTS_CHANNEL"]
 
 
 def get_base_url() -> str:
+    """Get the base URL for the environment.
+
+    Returns:
+        str: The base URL based on the environment.
+    """
     env = os.environ.get("FLASK_ENV", "development")
     if env == "production":
         return "https://example.com"
@@ -31,6 +37,15 @@ def get_base_url() -> str:
 
 
 def parse_dates(comparison_date: datetime, owner: bool) -> str:
+    """Parse dates for notification messages.
+
+    Args:
+        comparison_date (datetime): The date to compare.
+        owner (bool): Indicates if the user is an owner.
+
+    Returns:
+        str: The parsed date description.
+    """
     if not comparison_date:
         return "soon"
 
@@ -61,7 +76,15 @@ def parse_dates(comparison_date: datetime, owner: bool) -> str:
     return "soon"
 
 
-def get_user_id_by_email(email: str) -> str:
+def get_user_id_by_email(email: str) -> Optional[str]:
+    """Get Slack user ID by email.
+
+    Args:
+        email (str): The email of the user.
+
+    Returns:
+        Optional[str]: The Slack user ID if found, otherwise None.
+    """
     try:
         response = client.users_lookupByEmail(email=email)
         return response["user"]["id"]
@@ -71,6 +94,12 @@ def get_user_id_by_email(email: str) -> str:
 
 
 def send_slack_dm(user: OktaUser, message: str) -> None:
+    """Send a direct message to a Slack user.
+
+    Args:
+        user (OktaUser): The user to send the message to.
+        message (str): The message content.
+    """
     user_id = get_user_id_by_email(user.email)
     if user_id:
         mention_message = f"<@{user_id}> {message}"
@@ -84,6 +113,11 @@ def send_slack_dm(user: OktaUser, message: str) -> None:
 
 
 def send_slack_channel_message(message: str) -> None:
+    """Send a message to a Slack channel.
+
+    Args:
+        message (str): The message content.
+    """
     try:
         response = client.chat_postMessage(
             channel=alerts_channel, text=message, as_user=True, unfurl_links=True, unfurl_media=True
@@ -95,10 +129,16 @@ def send_slack_channel_message(message: str) -> None:
 
 @notification_hook_impl
 def access_request_created(
-    access_request: AccessRequest, group: OktaGroup, requester: OktaUser, approvers: list[OktaUser]
+    access_request: AccessRequest, group: OktaGroup, requester: OktaUser, approvers: List[OktaUser]
 ) -> None:
-    """Notify all the approvers of the access request through a notification"""
+    """Notify all the approvers of the access request through a notification.
 
+    Args:
+        access_request (AccessRequest): The access request.
+        group (OktaGroup): The group for which access is requested.
+        requester (OktaUser): The user requesting access.
+        approvers (List[OktaUser]): The list of approvers.
+    """
     type_of_access = "ownership of" if access_request.request_ownership else "membership to"
 
     access_request_url = get_base_url() + f"/requests/{access_request.id}"
@@ -122,10 +162,18 @@ def access_request_completed(
     access_request: AccessRequest,
     group: OktaGroup,
     requester: OktaUser,
-    approvers: list[OktaUser],
+    approvers: List[OktaUser],
     notify_requester: bool,
 ) -> None:
-    """Notify the requester that their access request has been processed."""
+    """Notify the requester that their access request has been processed.
+
+    Args:
+        access_request (AccessRequest): The access request.
+        group (OktaGroup): The group for which access is requested.
+        requester (OktaUser): The user requesting access.
+        approvers (List[OktaUser]): The list of approvers.
+        notify_requester (bool): Whether to notify the requester.
+    """
     access_request_url = get_base_url() + f"/requests/{access_request.id}"
 
     requester_message = (
@@ -143,8 +191,14 @@ def access_request_completed(
 
 
 @notification_hook_impl
-def access_expiring_user(groups: list[OktaGroup], user: OktaUser, expiration_datetime: datetime) -> None:
-    """Notify individuals that their access to a group is expiring soon"""
+def access_expiring_user(groups: List[OktaGroup], user: OktaUser, expiration_datetime: datetime) -> None:
+    """Notify individuals that their access to a group is expiring soon.
+
+    Args:
+        groups (List[OktaGroup]): The list of groups.
+        user (OktaUser): The user whose access is expiring.
+        expiration_datetime (datetime): The expiration date and time.
+    """
     expiring_access_url = get_base_url() + "/expiring-groups?user_id=@me"
 
     group_or_groups = f"{len(groups)} groups" if len(groups) > 1 else f"the group {groups[0].name}"
@@ -165,12 +219,20 @@ def access_expiring_user(groups: list[OktaGroup], user: OktaUser, expiration_dat
 @notification_hook_impl
 def access_expiring_owner(
     owner: OktaUser,
-    groups: list[OktaGroup],
-    roles: list[OktaGroup],
-    users: list[RoleGroup],
+    groups: List[OktaGroup],
+    roles: List[OktaGroup],
+    users: List[RoleGroup],
     expiration_datetime: datetime,
 ) -> None:
-    """Notify group owners that individuals or roles access to a group is expiring soon"""
+    """Notify group owners that individuals or roles access to a group is expiring soon.
+
+    Args:
+        owner (OktaUser): The owner of the group.
+        groups (List[OktaGroup]): The list of groups.
+        roles (List[OktaGroup]): The list of roles.
+        users (List[RoleGroup]): The list of users.
+        expiration_datetime (datetime): The expiration date and time.
+    """
     if users is not None and len(users) > 0:
         expiring_access_url = get_base_url() + "/expiring-groups?owner_id=@me"
 
