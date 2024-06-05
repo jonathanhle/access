@@ -3,14 +3,13 @@ import os
 from datetime import datetime, timezone
 
 import yaml
+from dotenv import load_dotenv
 from flask import Flask
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload, selectin_polymorphic, selectinload
 
 from api.extensions import db
 from api.models import AppGroup, OktaGroup, OktaUser, OktaUserGroupMember, RoleGroup
-
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -140,7 +139,6 @@ def add_owners_to_appropriate_twingate_group(resources: dict) -> None:
 
 
 def add_owners_to_aws_sso_group(resources: dict) -> None:
-    aws_sso_group_prefix = "APP_AWS_SSO_"
     aws_sso_services = resources["aws_services"]
 
     for service in aws_sso_services:
@@ -165,7 +163,7 @@ def add_owners_to_aws_sso_group(resources: dict) -> None:
                 logger.info(f"Group {group_name} not found.")
 
 
-def main() -> None:
+def sync_yaml_owners() -> None:
     """Main function to execute the script logic."""
     try:
         twingate_resources = load_config(SERVICES_TWINGATE_SSO)
@@ -180,4 +178,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     with app.app_context():
-        main()
+        sync_yaml_owners()
