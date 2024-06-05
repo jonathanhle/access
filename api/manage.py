@@ -1,6 +1,8 @@
 import click
 from flask.cli import with_appcontext
 
+from multipass_group_owners_sync import sync_yaml_owners  # Import the function
+
 
 @click.command("init")
 @click.argument("admin_okta_user_email")
@@ -192,3 +194,10 @@ def notify(owner: bool) -> None:
         expiring_access_notifications_owner()
     else:
         expiring_access_notifications_user()
+
+
+@click.command("sync-yaml-owners")
+@with_appcontext
+def sync_yaml_owners_command() -> None:
+    """Sync YAML Owners using the multipass_group_owners_sync script."""
+    sync_yaml_owners()
