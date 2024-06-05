@@ -61,6 +61,9 @@ RUN pip install -r ./notifications_slack/requirements.txt && pip install ./notif
 # Reset working directory for both final stages
 WORKDIR /app
 
+# Copy multipass_group_owners_sync.py to the root of the project directory
+COPY multipass_group_owners_sync.py /app/
+
 ENV FLASK_ENV production
 ENV FLASK_APP api.app:create_app
 ENV SENTRY_RELEASE $SENTRY_RELEASE
