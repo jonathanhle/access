@@ -29,7 +29,7 @@ RUN sentry-cli releases finalize ${SENTRY_RELEASE}
 RUN touch sentry
 
 # Build step #3: build the API with the client as static files
-FROM python:3.12 as false
+FROM python:3.12 as base
 ARG SENTRY_RELEASE=""
 WORKDIR /app
 COPY --from=build-step /app/build ./build
@@ -40,13 +40,26 @@ COPY requirements.txt api/ ./api/
 COPY migrations/ ./migrations/
 RUN pip install -r ./api/requirements.txt
 
-# Build an image that includes the optional sentry release push build step
-FROM false as true
+# Final build step for non-Sentry release
+FROM base as final-false
+COPY --from=build-step /app /app
+
+# Final build step for Sentry release
+FROM base as final-true
 COPY --from=sentry /app/sentry ./sentry
 
-# Final build step: copy the API and the client from the previous steps
-# Choose whether to include the sentry release push build step or not
-FROM ${PUSH_SENTRY_RELEASE}
+# Conditionally choose the final stage
+FROM final-${PUSH_SENTRY_RELEASE} as final
+
+# Add the specific plugins and install notifications for both final stages
+WORKDIR /app/plugins
+ADD ./examples/plugins/conditional_access_multipass ./conditional_access_multipass
+ADD ./examples/plugins/notifications_slack ./notifications_slack
+RUN pip install -r ./conditional_access_multipass/requirements.txt && pip install ./conditional_access_multipass
+RUN pip install -r ./notifications_slack/requirements.txt && pip install ./notifications_slack
+
+# Reset working directory for both final stages
+WORKDIR /app
 
 ENV FLASK_ENV production
 ENV FLASK_APP api.app:create_app
