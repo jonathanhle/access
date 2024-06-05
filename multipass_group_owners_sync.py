@@ -91,15 +91,19 @@ def add_owner_to_group(group: OktaGroup, owner_email: str) -> None:
 
         current_time = datetime.now(timezone.utc)
         existing_owner = (
-            db.session.query(OktaUserGroupMember)
-            .filter_by(group_id=group.id, user_id=owner.id, is_owner=True)
-            .filter((OktaUserGroupMember.ended_at == None) | (OktaUserGroupMember.ended_at > current_time))
-            .first()
+            db.session.query(OktaUserGroupMember).filter_by(group_id=group.id, user_id=owner.id, is_owner=True).first()
         )
 
         if existing_owner:
-            logger.info(f"User {owner_email} is already an active owner of the group {group.name}")
-            return
+            if existing_owner.ended_at is None or existing_owner.ended_at.replace(tzinfo=timezone.utc) > current_time:
+                logger.info(f"User {owner_email} is already an active owner of the group {group.name}")
+                return
+            else:
+                # Reactivate the owner
+                existing_owner.ended_at = None
+                db.session.commit()
+                logger.info(f"Reactivated {owner_email} as an owner of the group {group.name}")
+                return
 
         new_owner = OktaUserGroupMember(user_id=owner.id, group_id=group.id, is_owner=True)
         db.session.add(new_owner)
@@ -111,7 +115,62 @@ def add_owner_to_group(group: OktaGroup, owner_email: str) -> None:
         raise
 
 
-def add_owners_to_appropriate_twingate_group(resources: dict) -> None:
+def remove_owner_from_group(group: OktaGroup, owner_email: str) -> None:
+    """Removes an owner from a group if they are an active owner."""
+    try:
+        owner = db.session.query(OktaUser).filter_by(email=owner_email).first()
+        if not owner:
+            logger.info(f"No user found with email {owner_email}")
+            return
+
+        current_time = datetime.now(timezone.utc)
+        existing_owner = (
+            db.session.query(OktaUserGroupMember)
+            .filter_by(group_id=group.id, user_id=owner.id, is_owner=True)
+            .filter((OktaUserGroupMember.ended_at == None) | (OktaUserGroupMember.ended_at > current_time))
+            .first()
+        )
+
+        if existing_owner:
+            existing_owner.ended_at = current_time
+            db.session.commit()
+            logger.info(f"Removed {owner_email} as an owner from the group {group.name}")
+        else:
+            logger.info(f"User {owner_email} is not an active owner of the group {group.name}")
+    except SQLAlchemyError as e:
+        logger.error(f"Failed to remove owner from group: {e}")
+        db.session.rollback()
+        raise
+
+
+def sync_group_owners(group: OktaGroup, expected_owners: set) -> None:
+    """Synchronizes the owners of a group with the expected owners."""
+    try:
+        current_time = datetime.now(timezone.utc)
+        active_owners = (
+            db.session.query(OktaUserGroupMember)
+            .options(joinedload(OktaUserGroupMember.user))
+            .filter_by(group_id=group.id, is_owner=True)
+            .filter((OktaUserGroupMember.ended_at == None) | (OktaUserGroupMember.ended_at > current_time))
+            .all()
+        )
+
+        active_owner_emails = {owner.user.email for owner in active_owners}
+
+        # Add new owners
+        for owner_email in expected_owners - active_owner_emails:
+            add_owner_to_group(group, owner_email)
+
+        # Remove owners not in the expected list
+        for owner_email in active_owner_emails - expected_owners:
+            remove_owner_from_group(group, owner_email)
+    except SQLAlchemyError as e:
+        logger.error(f"Failed to sync owners for group {group.name}: {e}")
+        db.session.rollback()
+        raise
+
+
+def sync_twingate_groups(resources: dict) -> None:
     twingate_group_prefix = "APP_TG_"
     twingate_resource_services = resources["twingate_services"]
 
@@ -126,19 +185,17 @@ def add_owners_to_appropriate_twingate_group(resources: dict) -> None:
         ]
 
         all_owners = set(system_owners_groups + users)
-        for owner in all_owners:
-            # Try first with the prefix
-            group_name = f"{twingate_group_prefix}{service_name}"
-            group = get_group_by_name(group_name)
+        group_name = f"{twingate_group_prefix}{service_name}"
+        group = get_group_by_name(group_name)
 
-            # Add to group if it exists
-            if group:
-                add_owner_to_group(group, owner)
-            else:
-                logger.info(f"Group {group_name} not found.")
+        # Sync group owners
+        if group:
+            sync_group_owners(group, all_owners)
+        else:
+            logger.info(f"Group {group_name} not found.")
 
 
-def add_owners_to_aws_sso_group(resources: dict) -> None:
+def sync_aws_sso_groups(resources: dict) -> None:
     aws_sso_services = resources["aws_services"]
 
     for service in aws_sso_services:
@@ -152,15 +209,13 @@ def add_owners_to_aws_sso_group(resources: dict) -> None:
         ]
 
         all_owners = set(system_owners_groups + users)
-        for owner in all_owners:
-            group_name = service_name
-            group = get_group_by_name(group_name)
+        group = get_group_by_name(service_name)
 
-            # Add to group if it exists
-            if group:
-                add_owner_to_group(group, owner)
-            else:
-                logger.info(f"Group {group_name} not found.")
+        # Sync group owners
+        if group:
+            sync_group_owners(group, all_owners)
+        else:
+            logger.info(f"Group {service_name} not found.")
 
 
 def sync_yaml_owners() -> None:
@@ -169,8 +224,8 @@ def sync_yaml_owners() -> None:
         twingate_resources = load_config(SERVICES_TWINGATE_SSO)
         aws_sso_resources = load_config(SERVICES_AWS_SSO)
 
-        add_owners_to_appropriate_twingate_group(twingate_resources)
-        add_owners_to_aws_sso_group(aws_sso_resources)
+        sync_twingate_groups(twingate_resources)
+        sync_aws_sso_groups(aws_sso_resources)
     except Exception as e:
         logger.error(f"An error occurred during the main execution: {e}")
         raise
