@@ -7,7 +7,7 @@ FROM node:22-alpine as build-step
 ARG SENTRY_RELEASE=""
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
-COPY craco.config.js package.json package-lock.json tsconfig.json tsconfig.paths.json .env.production* ./
+COPY craco.config.js package.json package-lock.json tsconfig.json tsconfig.paths.json ./
 COPY ./src ./src
 COPY ./public ./public
 RUN npm install
