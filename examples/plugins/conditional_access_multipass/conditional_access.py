@@ -1,20 +1,26 @@
 from __future__ import print_function
 
 import logging
+import os
 from typing import List, Optional
 
 import pluggy
 from clients.pagerduty import get_pd_user_id, get_pd_user_incidents
 from clients.query_access_db import get_group_by_name
-from clients.yaml_aws_sso import find_first_matching_service
+from clients.yaml_aws_sso import download_latest_yaml_from_s3, find_first_matching_service
 
 from api.models import AccessRequest, OktaGroup, OktaUser, Tag
-from api.plugins import ConditionalAccessResponse
-
 from api.operations.reject_access_request import RejectAccessRequest
+from api.plugins import ConditionalAccessResponse
 
 request_hook_impl = pluggy.HookimplMarker("access_conditional_access")
 logger = logging.getLogger(__name__)
+
+# S3 configuration
+S3_AWS_SSO_KEY = os.getenv("S3_AWS_SSO_KEY")
+S3_TWINGATE_KEY = os.getenv("S3_TWINGATE_KEY")
+SERVICES_AWS_SSO_PATH = os.getenv("SERVICES_AWS_SSO_PATH")
+SERVICES_TWINGATE_SSO_PATH = os.getenv("SERVICES_TWINGATE_SSO_PATH")
 
 
 @request_hook_impl
@@ -22,6 +28,10 @@ def access_request_created(
     access_request: AccessRequest, group: OktaGroup, group_tags: List[Tag], requester: OktaUser
 ) -> Optional[ConditionalAccessResponse]:
     """Auto-approve memberships to the Auto-Approved-Group group"""
+
+    # Download the latest YAML files if they are newer
+    download_latest_yaml_from_s3(S3_AWS_SSO_KEY, SERVICES_AWS_SSO_PATH)
+    download_latest_yaml_from_s3(S3_TWINGATE_KEY, SERVICES_TWINGATE_SSO_PATH)
 
     # Immediately reject requests for Group Ownership
     if access_request.request_ownership:
@@ -85,7 +95,7 @@ def access_request_created(
                     ]
                     + yaml_service_non_sensitive_access_users
                 )
-                logger.info(f"Non Sensitive Access memebrs are: {yaml_service_non_sensitive_members}")
+                logger.info(f"Non Sensitive Access members are: {yaml_service_non_sensitive_members}")
             else:
                 logger.info("Non-sensitive access is not enabled.")
             # -----------------------------------------------------------

@@ -10,6 +10,7 @@ from sqlalchemy.orm import joinedload, selectin_polymorphic, selectinload
 
 from api.extensions import db
 from api.models import AppGroup, OktaGroup, OktaUser, OktaUserGroupMember, RoleGroup
+from plugins.conditional_access_multipass.clients.yaml_aws_sso import download_latest_yaml_from_s3
 
 load_dotenv()
 
@@ -32,14 +33,16 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Get the environment variables
-SERVICES_AWS_SSO = os.getenv("SERVICES_AWS_SSO")
-SERVICES_TWINGATE_SSO = os.getenv("SERVICES_TWINGATE_SSO")
+SERVICES_AWS_SSO_PATH = os.getenv("SERVICES_AWS_SSO_PATH")
+SERVICES_TWINGATE_SSO_PATH = os.getenv("SERVICES_TWINGATE_SSO_PATH")
+S3_AWS_SSO_KEY = os.getenv("S3_AWS_SSO_KEY")
+S3_TWINGATE_KEY = os.getenv("S3_TWINGATE_KEY")
 
-if not SERVICES_AWS_SSO or not SERVICES_TWINGATE_SSO:
-    raise EnvironmentError("SERVICES_AWS_SSO or SERVICES_TWINGATE_SSO environment variable not set")
+if not SERVICES_AWS_SSO_PATH or not SERVICES_TWINGATE_SSO_PATH:
+    raise EnvironmentError("SERVICES_AWS_SSO_PATH or SERVICES_TWINGATE_SSO_PATH environment variable not set")
 
-SERVICES_AWS_SSO = os.path.abspath(SERVICES_AWS_SSO)
-SERVICES_TWINGATE_SSO = os.path.abspath(SERVICES_TWINGATE_SSO)
+SERVICES_AWS_SSO_PATH = os.path.abspath(SERVICES_AWS_SSO_PATH)
+SERVICES_TWINGATE_SSO_PATH = os.path.abspath(SERVICES_TWINGATE_SSO_PATH)
 
 
 def load_config(file_path: str) -> dict:
@@ -221,8 +224,12 @@ def sync_aws_sso_groups(resources: dict) -> None:
 def sync_yaml_owners() -> None:
     """Main function to execute the script logic."""
     try:
-        twingate_resources = load_config(SERVICES_TWINGATE_SSO)
-        aws_sso_resources = load_config(SERVICES_AWS_SSO)
+        # Download the latest YAML files if they are newer
+        download_latest_yaml_from_s3(S3_AWS_SSO_KEY, SERVICES_AWS_SSO_PATH)
+        download_latest_yaml_from_s3(S3_TWINGATE_KEY, SERVICES_TWINGATE_SSO_PATH)
+
+        twingate_resources = load_config(SERVICES_TWINGATE_SSO_PATH)
+        aws_sso_resources = load_config(SERVICES_AWS_SSO_PATH)
 
         sync_twingate_groups(twingate_resources)
         sync_aws_sso_groups(aws_sso_resources)
