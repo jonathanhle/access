@@ -17,6 +17,7 @@ const queryClient = new QueryClient({
   },
 });
 
+console.log(`Environment variable: ${process.env.REACT_APP_OKTA_APP_NAME_PATTERN}`);
 declare module '@mui/material/styles' {
   interface Palette {
     primary_extra_light: Palette['primary'];

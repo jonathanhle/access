@@ -19,6 +19,8 @@ import Typography from '@mui/material/Typography';
 
 import {FormContainer, SelectElement, AutocompleteElement, TextFieldElement} from 'react-hook-form-mui';
 
+import {regexConfig} from '../../RegexConfig';
+
 import {
   useGetApps,
   useGetTags,
@@ -261,7 +263,7 @@ function GroupDialog(props: GroupDialogProps) {
                 disabled={props.app_owner_group}
                 validation={{
                   maxLength: 255,
-                  pattern: /^[A-Z][A-Za-z0-9\-]*$/,
+                  pattern: regexConfig.namePattern,
                 }}
                 parseError={(error) => {
                   if (error?.message != '') {
@@ -271,7 +273,7 @@ function GroupDialog(props: GroupDialogProps) {
                     return 'Name can be at most 255 characters in length';
                   }
                   if (error.type == 'pattern') {
-                    return 'Name must start capitalized and contain only alphanumeric characters or hyphens. Regex to match /^[A-Z][A-Za-z0-9-]*$/';
+                    return 'Name must start capitalized and contain alphanumeric characters, underscores, @, periods, hyphens, backslash or *.';
                   }
 
                   return '';
