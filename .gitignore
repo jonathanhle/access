@@ -498,3 +498,4 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,visualstudiocode,jetbrains+all,node,python,flask
 .env.production-aws
+.env.production*
