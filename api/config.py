@@ -1,11 +1,8 @@
 import json
 import os
-from dotenv import load_dotenv
 
 ENV = os.getenv("FLASK_ENV")
 DEBUG = ENV == "development"
-
-load_dotenv()
 
 CLIENT_ORIGIN_URL = os.getenv("CLIENT_ORIGIN_URL")
 
