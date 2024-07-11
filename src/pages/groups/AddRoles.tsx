@@ -100,7 +100,6 @@ const UNTIL_JUST_NUMERIC_ID_TO_LABELS: Record<string, string> = {
  */
 const UNTIL_ID_TO_LABELS = AccessTime;
 const UNTIL_JUST_NUMERIC_ID_TO_LABELS = AccessTime;
-console.log('What the value is -', UNTIL_ID_TO_LABELS);
 
 const UNTIL_OPTIONS = Object.entries(UNTIL_ID_TO_LABELS).map(([id, label], index) => ({id: id, label: label}));
 
