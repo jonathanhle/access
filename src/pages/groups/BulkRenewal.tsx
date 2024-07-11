@@ -33,6 +33,9 @@ import {displayUserName, minTagTimeGroups, requiredReasonGroups} from '../../hel
 import {usePutGroupMembersById, PutGroupMembersByIdError, PutGroupMembersByIdVariables} from '../../api/apiComponents';
 import {GroupMember, OktaUserGroupMember, PolymorphicGroup, RoleGroupMap, RoleGroup} from '../../api/apiSchemas';
 
+import {AccessTime} from '../../env-react';
+import {DEFAULT_ACCESS_TIME} from '../../env-react';
+
 interface Data {
   id: number;
   userName: string;
@@ -70,7 +73,7 @@ interface CreateRequestForm {
   reason?: string;
 }
 
-const UNTIL_ID_TO_LABELS: Record<string, string> = {
+/**const UNTIL_ID_TO_LABELS: Record<string, string> = {
   '14400': '4 Hours',
   '43200': '12 Hours',
   '432000': '5 Days',
@@ -87,6 +90,10 @@ const UNTIL_JUST_NUMERIC_ID_TO_LABELS: Record<string, string> = {
   '2592000': '30 Days',
   '7776000': '90 Days',
 } as const;
+ */
+
+const UNTIL_ID_TO_LABELS = AccessTime;
+const UNTIL_JUST_NUMERIC_ID_TO_LABELS = AccessTime;
 
 const UNTIL_OPTIONS = Object.entries(UNTIL_ID_TO_LABELS).map(([id, label], index) => ({id: id, label: label}));
 
@@ -154,7 +161,7 @@ function BulkRenewalDialog(props: BulkRenewalDialogProps) {
   const [selected, setSelected] = React.useState<OktaUserGroupMember[]>(() =>
     props.select != undefined ? props.rows.filter((r) => r.id == props.select) : [],
   );
-  const [until, setUntil] = React.useState('43200');
+  const [until, setUntil] = React.useState(DEFAULT_ACCESS_TIME);
 
   const [selectionModel, setSelectionModel] = React.useState<GridRowSelectionModel>(() =>
     props.rows.filter((r) => r.id == props.select).map((r) => r.id),
