@@ -212,7 +212,7 @@ function TagDialog(props: TagDialogProps) {
                       return 'Name can be at most 255 characters in length';
                     }
                     if (error.type == 'pattern') {
-                      return `Name must start capitalized and contain only alphanumeric characters, hyphens, asterisks, or at signs. Regex to match ${regexConfig.namePattern}`;
+                      return `Name must start capitalized and contain only alphanumeric characters & hyphens. Regex to match ${regexConfig.namePattern}`;
                     }
 
                     return '';
