@@ -840,7 +840,7 @@ class AppGroupSchema(SQLAlchemyAutoSchema):
             validate.Length(min=1, max=255),
             validate.Regexp(
                 f"^{AppGroup.APP_GROUP_NAME_PREFIX}{OKTA_APP_NAME_PATTERN}{AppGroup.APP_NAME_GROUP_NAME_SEPARATOR}{OKTA_APP_NAME_PATTERN}$",
-                error="App group name must start capitalized and contain characters allowed in the regex. "
+                error="Group name must start capitalized and contain characters allowed in the regex. "
                 "Regex to match: /{regex}/",
             ),
         ),
@@ -1133,7 +1133,7 @@ class InitialAppGroupSchema(Schema):
             validate.Length(min=1, max=255),
             validate.Regexp(
                 f"^{AppGroup.APP_GROUP_NAME_PREFIX}{OKTA_APP_NAME_PATTERN}{AppGroup.APP_NAME_GROUP_NAME_SEPARATOR}{OKTA_APP_NAME_PATTERN}$",
-                error="App group name must start capitalized and contain characters allowed in the regex. "
+                error="Group name must start capitalized and contain characters allowed in the regex. "
                 "Regex to match: /{regex}/",
             ),
         ),
