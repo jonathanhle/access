@@ -8,7 +8,7 @@ const defaultAccessTime = {
   custom: 'Custom',
 } as const;
 
-// Use process.env.REACT_APP_ACCESS_TIME if defined, otherwise use default
+// Uses process.env.REACT_APP_ACCESS_TIME if defined, otherwise uses default
 const AccessTime: Record<string, string> = process.env.REACT_APP_ACCESS_TIME
   ? JSON.parse(process.env.REACT_APP_ACCESS_TIME)
   : defaultAccessTime;

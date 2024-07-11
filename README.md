@@ -47,6 +47,15 @@ DATABASE_URI="sqlite:///access.db"
 CLIENT_ORIGIN_URL=http://localhost:3000
 REACT_APP_API_SERVER_URL=http://localhost:6060
 ```
+<!---
+REACT_APP_ACCESS_TIME='{"14400":"4 Hours","43200":"12 Hours","432000":"5 Days","1209600":"Two Weeks","2592000":"30 Days","7776000":"90 Days"}'
+REACT_APP_DEFAULT_ACCESS_TIME='43200'
+-->
+```
+
+```
+<!---
+For the access time-related environment variable, add a dictionary that includes the options you want in the dropdown for providing access duration for roles, members, and requests. Set the access time variable to have a default setting that will be assigned to the user unless otherwise specified by the user.-->
 
 Next, run the following commands to set up your python virtual environment. Access can be run with Python 3.10 and above:
 
