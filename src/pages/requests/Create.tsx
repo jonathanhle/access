@@ -42,6 +42,8 @@ import {
 } from '../../api/apiSchemas';
 import {canManageGroup} from '../../authorization';
 import {minTagTime, minTagTimeGroups} from '../../helpers';
+import {AccessTime} from '../../env-react';
+import {DEFAULT_ACCESS_TIME} from '../../env-react';
 
 dayjs.extend(IsSameOrBefore);
 
@@ -167,24 +169,8 @@ const GROUP_TYPE_ID_TO_LABELS: Record<string, string> = {
 } as const;
 
 const RFC822_FORMAT = 'ddd, DD MMM YYYY HH:mm:ss ZZ';
-
-const UNTIL_ID_TO_LABELS: Record<string, string> = {
-  '14400': '4 Hours',
-  '43200': '12 Hours',
-  '432000': '5 Days',
-  '1209600': 'Two Weeks',
-  '2592000': '30 Days',
-  '7776000': '90 Days',
-} as const;
-
-const UNTIL_JUST_NUMERIC_ID_TO_LABELS: Record<string, string> = {
-  '14400': '4 Hours',
-  '43200': '12 Hours',
-  '432000': '5 Days',
-  '1209600': 'Two Weeks',
-  '2592000': '30 Days',
-  '7776000': '90 Days',
-} as const;
+const UNTIL_ID_TO_LABELS = AccessTime;
+const UNTIL_JUST_NUMERIC_ID_TO_LABELS = AccessTime;
 
 const UNTIL_OPTIONS = Object.entries(UNTIL_ID_TO_LABELS).map(([id, label], index) => ({id: id, label: label}));
 
@@ -232,7 +218,7 @@ function CreateRequestContainer(props: CreateRequestContainerProps) {
 
   const untilLabels: [string, Array<Record<string, string>>] = timeLimit
     ? filterUntilLabels(timeLimit)
-    : ['43200', UNTIL_OPTIONS];
+    : [DEFAULT_ACCESS_TIME, UNTIL_OPTIONS];
   const [until, setUntil] = React.useState(untilLabels[0]);
   const [labels, setLabels] = React.useState<Array<Record<string, string>>>(untilLabels[1]);
 
@@ -320,7 +306,7 @@ function CreateRequestContainer(props: CreateRequestContainerProps) {
     <FormContainer<CreateRequestForm>
       defaultValues={{
         group: props.group,
-        until: '43200',
+        until: DEFAULT_ACCESS_TIME,
         ownerOrMember: props.owner != null ? (props.owner ? 'owner' : 'member') : undefined,
       }}
       onSuccess={(formData) => submit(formData)}>
