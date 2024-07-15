@@ -47,7 +47,13 @@ DATABASE_URI="sqlite:///access.db"
 CLIENT_ORIGIN_URL=http://localhost:3000
 REACT_APP_API_SERVER_URL=http://localhost:6060
 ```
-
+<!--
+REACT_APP_OKTA_APP_NAME_PATTERN="^[A-Z][A-Za-z0-9_@.\-*.]*$"
+OKTA_APP_NAME_PATTERN="[A-Z][A-Za-z0-9_@.\-*.]*"
+-->
+<!--
+Set the regex variables in the .env file for the frontend and backend for group names and tag names as per the user's requirements. If not specified, the default regex rules set by access will be applied.
+-->
 Next, run the following commands to set up your python virtual environment. Access can be run with Python 3.10 and above:
 
 ```

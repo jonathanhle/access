@@ -10,8 +10,12 @@ OKTA_DOMAIN = os.getenv("OKTA_DOMAIN")
 OKTA_API_TOKEN = os.getenv("OKTA_API_TOKEN")
 # The Group Owners API is only available to Okta plans with IGA enabled
 # Disable by default, but allow opt-in to sync group owners to Okta if desired
+
 OKTA_USE_GROUP_OWNERS_API = os.getenv("OKTA_USE_GROUP_OWNERS_API", "False") == "True"
 CURRENT_OKTA_USER_EMAIL = os.getenv("CURRENT_OKTA_USER_EMAIL", "wumpus@discord.com")
+
+#if regex not specified by user, default value set by discord access taken
+OKTA_APP_NAME_PATTERN = os.getenv("OKTA_APP_NAME_PATTERN", "^[A-Z][A-Za-z0-9-]*$")
 
 SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI")
 SQLALCHEMY_TRACK_MODIFICATIONS = False
