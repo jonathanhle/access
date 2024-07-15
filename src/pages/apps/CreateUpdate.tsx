@@ -159,7 +159,7 @@ function AppDialog(props: AppDialogProps) {
                   return 'Name can be at most 255 characters in length';
                 }
                 if (error.type == 'pattern') {
-                  return `Name must start capitalized and contain only alphanumeric characters or hyphens. Regex to match ${regexConfig.namePattern}`;
+                   return `Name must start capitalized and contain characters allowed in the regex. ${regexConfig.namePattern}`;
                 }
 
                 return '';
